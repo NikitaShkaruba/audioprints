@@ -7,7 +7,7 @@ class Matcher:
     def __init__(self):
         pass
 
-    #
+    # Находит песню, сохраненную в базе данных по отпечаткам
     @staticmethod
     def matchFingerprints(matching_fingerprints):
         # Вытаскиваем идиентичные оптечатки с базы

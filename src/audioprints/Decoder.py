@@ -1,12 +1,11 @@
 # coding=utf-8
-# Фаил для декодирования mp3
 
 import os
 import numpy as np
 from pydub import AudioSegment
 from hashlib import sha1
 
-# Достает из фаила с музыкой каналы через ffmpeg
+# Класс для декодирования mp3 фаила на каналы через ffmpeg
 class Decoder:
 
     def __init__(self):

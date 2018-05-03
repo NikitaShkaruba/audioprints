@@ -2,7 +2,7 @@
 
 import psycopg2
 
-# Класс для взаимосвязи с базой данных
+# Класс для работы с базой данных
 class PostgreSQL:
     config = {
         "dbname":   'nvdvmymy',

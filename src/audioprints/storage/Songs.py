@@ -3,7 +3,7 @@
 from audioprints.objects.Song import Song
 from audioprints.storage.PostgreSQL import PostgreSQL
 
-# Класс CRUD для работы с таблицей songs
+# Класс для работы с базой данных songs
 class Songs:
     table_name = 'songs'
 

@@ -1,10 +1,10 @@
 # coding=utf-8
-from math import ceil
 
+from math import ceil
 from audioprints.objects.Fingerprint import Fingerprint
 from audioprints.storage.PostgreSQL import PostgreSQL
 
-
+# Класс для работы с базой данных отпечатков
 class Fingerprints:
     table_name = 'fingerprints'
 
@@ -68,7 +68,6 @@ class Fingerprints:
                 chunks.append(hashes[min_index:])
 
         return chunks
-
 
     @staticmethod
     def delete(fingerprint_id):
