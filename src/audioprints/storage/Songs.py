@@ -16,7 +16,7 @@ class Songs:
 
     @staticmethod
     def selectOneByFileHash(file_hash):
-        rows = PostgreSQL.executeFetch("""SELECT * FROM %s where file_hash = '%s'""" % (Songs.table_name, file_hash))
+        rows = PostgreSQL.executeFetch("""SELECT * FROM %s WHERE file_hash = '%s'""" % (Songs.table_name, file_hash))
         if len(rows) == 0:
             return []
 
@@ -25,7 +25,7 @@ class Songs:
 
     @staticmethod
     def selectByName(audio_name):
-        rows = PostgreSQL.executeFetch("SELECT * FROM %s where name like '%%%s%%'" % (Songs.table_name, audio_name))
+        rows = PostgreSQL.executeFetch("SELECT * FROM %s WHERE name ILIKE '%%%s%%'" % (Songs.table_name, audio_name))
 
         songs = []
         for row in rows:
