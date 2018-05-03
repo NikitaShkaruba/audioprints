@@ -9,11 +9,11 @@ from audioprints import AudioPrints
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("audioprints", None, "AudioPrints: Audio Fingerprinting made with ease", formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument('-a', '--add', metavar="file_path", help="Adds song to database by file_path")
-    parser.add_argument('-m', '--match', metavar="file_path", help="Matches audio from file for some from our database")
-    parser.add_argument('-v', '--view', metavar="file_path", help="Creates gui for song's spectogram and peaks")
-    parser.add_argument('-s', '--search', metavar="song_name", help="Searches database by song name, using 'LIKE %song_name%'")
-    parser.add_argument('-d', '--delete', metavar="song_id", help="Deletes song from database")
+    parser.add_argument('-a', '--add', metavar="file_path", help="Adds audio from file_path to fingerprints database")
+    parser.add_argument('-m', '--match', metavar="file_path", help="Matches audio from file_path with ones from our database")
+    parser.add_argument('-v', '--view', metavar="file_path", help="Creates gui with spectogram and peaks for audio from file_path")
+    parser.add_argument('-s', '--search', metavar="song_name", help="Searches for added to database audio by song_name, using 'LIKE %song_name%'")
+    parser.add_argument('-d', '--delete', metavar="song_id", help="Deletes song from database by song_id")
 
     args = parser.parse_args()
 
