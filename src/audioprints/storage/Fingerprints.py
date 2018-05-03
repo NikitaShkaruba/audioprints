@@ -11,7 +11,6 @@ class Fingerprints:
     @staticmethod
     def insert(fingerprint):
         PostgreSQL.execute("""INSERT INTO %s (song_id, song_offset, hash) VALUES (%s, %s, '%s')""" % (Fingerprints.table_name, fingerprint.song_id, fingerprint.offset, fingerprint.hash))
-        pass
 
     @staticmethod
     def selectByHash(hash):
