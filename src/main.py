@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--add', metavar="file_path", help="Adds song to database by file_path")
     parser.add_argument('-v', '--view', metavar="file_path", help="Creates gui for song's spectogram and peaks")
     parser.add_argument('-r', '--recognize', nargs=1, choices=[ 'mic', 'file' ], help="Recognizes audio from microphone or file with some from audioprints database")
-    parser.add_argument('-s', '--search', metavar="song_name", help="Searches database by song name.")
+    parser.add_argument('-s', '--search', metavar="song_name", help="Searches database by song name, using 'LIKE %song_name%'")
     parser.add_argument('-d', '--delete', metavar="song_id", help="Deletes song from database")
 
     args = parser.parse_args()
@@ -31,11 +31,20 @@ if __name__ == '__main__':
         AudioPrints.view(file_path)
 
     elif args.recognize:
-        print("Recognize is not implemented yet")
+        print "Recognize is not implemented yet"
         pass
 
     elif args.search:
-        print("Search is not implemented yet")
+        song_name = args.search
+
+        songs = AudioPrints.search(song_name)
+        if len(songs) == 0:
+            print "Songs not found"
+
+        print "Found songs:"
+        for song in songs:
+            print "\tid: %s, name: %s" % (song.id, song.name)
+
         pass
 
     elif args.delete:

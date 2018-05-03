@@ -24,6 +24,16 @@ class Songs:
         return Song(row[1], row[2], row[3], row[0])
 
     @staticmethod
+    def selectByName(audio_name):
+        rows = PostgreSQL.executeFetch("SELECT * FROM %s where name like '%%%s%%'" % (Songs.table_name, audio_name))
+
+        songs = []
+        for row in rows:
+            songs.append(Song(row[1], row[2], row[3], row[0]))
+
+        return songs
+
+    @staticmethod
     def updateIsFingerprinted(song_id, is_fingerprinted):
         PostgreSQL.execute("""UPDATE %s SET is_fingerprinted = %s WHERE id = %s""" % (Songs.table_name, is_fingerprinted, song_id))
 

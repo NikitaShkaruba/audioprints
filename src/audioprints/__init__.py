@@ -44,6 +44,10 @@ class AudioPrints:
         return song_name
 
     @staticmethod
+    def search(audio_name):
+        return Songs.selectByName(audio_name)
+
+    @staticmethod
     def view(audio_file_path):
         song_name = decoding.getSongNameFromPath(audio_file_path)
         song_hash = decoding.getSongFileHash(audio_file_path)
