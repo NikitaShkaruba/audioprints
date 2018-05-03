@@ -1,3 +1,6 @@
+# coding=utf-8
+from math import ceil
+
 from audioprints.objects.Fingerprint import Fingerprint
 from audioprints.storage.PostgreSQL import PostgreSQL
 
@@ -23,14 +26,49 @@ class Fingerprints:
         PostgreSQL.execute("""INSERT INTO %s (song_id, song_offset, hash) VALUES %s""" % (Fingerprints.table_name, values_string))
 
     @staticmethod
-    def selectByHash(hash):
-        rows = PostgreSQL.executeFetch("""SELECT * FROM %s WHERE hash = '%s'""" % (Fingerprints.table_name, hash))
+    def selectOneByHash(hash):
+        fingerprints = Fingerprints.selectManyByHashes([hash]);
+        if len(fingerprints) == 0:
+            return []
+
+        return fingerprints[0]
+
+    @staticmethod
+    def selectManyByHashes(hashes):
+        chunkified_hashes = Fingerprints.chunkifyHashes(hashes)
 
         fingerprints = []
-        for row in rows:
-            fingerprints.append(Fingerprint(row[1], row[2], row[3], row[0]))
+        for hashes_chunk in chunkified_hashes:
+            hashes_string = ','.join(map(lambda h: "'%s'" % h, hashes_chunk))
+
+            rows = PostgreSQL.executeFetch("""SELECT * FROM %s WHERE hash IN (%s)""" % (Fingerprints.table_name, hashes_string))
+            for row in rows:
+                fingerprints.append(Fingerprint(row[1], row[2], row[3], row[0]))
 
         return fingerprints
+
+    # Группирует хеши по 500 в каждом чанке
+    @staticmethod
+    def chunkifyHashes(hashes):
+        hashes_amount = len(hashes)
+
+        hashes_in_chunk = 500
+        chunks_amount = int(ceil(float(hashes_amount) / hashes_in_chunk))
+        if chunks_amount <= 1:
+            return [hashes]
+
+        chunks = []
+        for chunk_id in range(0, chunks_amount):
+            min_index = hashes_in_chunk * chunk_id
+            max_index = hashes_in_chunk * (chunk_id + 1)
+
+            if max_index < hashes_amount:
+                chunks.append(hashes[min_index:max_index])
+            else:
+                chunks.append(hashes[min_index:])
+
+        return chunks
+
 
     @staticmethod
     def delete(fingerprint_id):

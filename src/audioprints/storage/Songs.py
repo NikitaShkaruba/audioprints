@@ -21,7 +21,16 @@ class Songs:
             return []
 
         row = rows[0]
-        return Song(row[1], row[2], row[3], row[0])
+        return Songs.mapRowToSong(row)
+
+    @staticmethod
+    def selectOneById(song_id):
+        rows = PostgreSQL.executeFetch("""SELECT * FROM %s WHERE id = %s""" % (Songs.table_name, song_id))
+        if len(rows) == 0:
+            return []
+
+        row = rows[0]
+        return Songs.mapRowToSong(row)
 
     @staticmethod
     def selectByName(audio_name):
@@ -29,9 +38,13 @@ class Songs:
 
         songs = []
         for row in rows:
-            songs.append(Song(row[1], row[2], row[3], row[0]))
+            songs.append(Songs.mapRowToSong(row))
 
         return songs
+
+    @staticmethod
+    def mapRowToSong(row):
+        return Song(row[1], row[2], row[3], row[0])
 
     @staticmethod
     def updateIsFingerprinted(song_id, is_fingerprinted):

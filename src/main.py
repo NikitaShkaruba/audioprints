@@ -4,14 +4,13 @@
 
 import sys
 import argparse
-
 from audioprints import AudioPrints
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("audioprints", None, "AudioPrints: Audio Fingerprinting made with ease", formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-a', '--add', metavar="file_path", help="Adds song to database by file_path")
+    parser.add_argument('-m', '--match', metavar="file_path", help="Matches audio from file for some from our database")
     parser.add_argument('-v', '--view', metavar="file_path", help="Creates gui for song's spectogram and peaks")
-    parser.add_argument('-r', '--recognize', nargs=1, choices=[ 'mic', 'file' ], help="Recognizes audio from microphone or file with some from audioprints database")
     parser.add_argument('-s', '--search', metavar="song_name", help="Searches database by song name, using 'LIKE %song_name%'")
     parser.add_argument('-d', '--delete', metavar="song_id", help="Deletes song from database")
 
@@ -26,13 +25,18 @@ if __name__ == '__main__':
         except BaseException:
             print sys.exc_info()[1]
 
+    elif args.match:
+        file_path = args.match
+
+        try:
+            song = AudioPrints.match(file_path)
+            print "Song matched: %s - %s" % (song.id, song.name)
+        except BaseException:
+            print sys.exc_info()[1]
+
     elif args.view:
         file_path = args.view
         AudioPrints.view(file_path)
-
-    elif args.recognize:
-        print "Recognize is not implemented yet"
-        pass
 
     elif args.search:
         song_name = args.search

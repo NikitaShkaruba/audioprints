@@ -1,8 +1,9 @@
 # coding=utf-8
 
-from audioprints import decoding, extracting
+from audioprints import decoder, extractor, Matcher
 import matplotlib.pyplot as plt
 
+from audioprints.Matcher import Matcher
 from audioprints.objects.Song import Song
 from audioprints.storage.Fingerprints import Fingerprints
 from audioprints.storage.Songs import Songs
@@ -14,8 +15,8 @@ class AudioPrints:
 
     @staticmethod
     def add(audio_file_path):
-        song_name = decoding.getSongNameFromPath(audio_file_path)
-        hash = decoding.getSongFileHash(audio_file_path)
+        song_name = decoder.getSongNameFromPath(audio_file_path)
+        hash = decoder.getSongFileHash(audio_file_path)
         if not (song_name or hash):
             raise Exception("No song name or hash")
 
@@ -29,12 +30,12 @@ class AudioPrints:
             song_id = song.id
 
         # Декодируем каналы
-        channels, frame_rate = decoding.decodeChannelsFromFile(audio_file_path)
+        channels, frame_rate = decoder.decodeChannelsFromFile(audio_file_path)
 
         # Снимаем отпечатки
         fingerprints = set()
         for channel_number, channel_frequencies in enumerate(channels):
-            fingerprints |= set(extracting.extractFingerprints(channel_frequencies, song_id, frame_rate))
+            fingerprints |= set(extractor.extractFingerprints(channel_frequencies, song_id, frame_rate))
 
         Fingerprints.insertMany(fingerprints)
 
@@ -44,21 +45,36 @@ class AudioPrints:
         return song_name
 
     @staticmethod
+    def match(audio_file_path):
+        channels, frame_rate = decoder.decodeChannelsFromFile(audio_file_path)
+
+        # Снимаем отпечатки с каналов
+        fingerprints = []
+        for channel in channels:
+            fingerprints.extend(extractor.extractFingerprints(channel))
+
+        # Ищем сматченную песню
+        matched_song_id = Matcher.matchFingerprints(fingerprints)
+
+        # Достаем песню
+        return Songs.selectOneById(matched_song_id)
+
+    @staticmethod
     def search(audio_name):
         return Songs.selectByName(audio_name)
 
     @staticmethod
     def view(audio_file_path):
-        song_name = decoding.getSongNameFromPath(audio_file_path)
-        song_hash = decoding.getSongFileHash(audio_file_path)
+        song_name = decoder.getSongNameFromPath(audio_file_path)
+        song_hash = decoder.getSongFileHash(audio_file_path)
         if not (song_name or song_hash):
             raise Exception("No song name or hash")
 
-        channels, frame_rate = decoding.decodeChannelsFromFile(audio_file_path)
+        channels, frame_rate = decoder.decodeChannelsFromFile(audio_file_path)
 
         for channel_number, channel_frequencies in enumerate(channels):
-            spectogram = extracting.extractSpectogram(channel_frequencies, frame_rate)
-            peaks = extracting.extractPeaks(channel_frequencies, frame_rate)
+            spectogram = extractor.extractSpectogram(channel_frequencies, frame_rate)
+            peaks = extractor.extractPeaks(channel_frequencies, frame_rate)
 
             # Подгоняем под структуру, в которую умеет matplotlib.pyplot
             frequencies = [peak.frequency for peak in peaks]

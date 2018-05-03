@@ -20,7 +20,7 @@ MIN_HASH_TIME_DELTA = 0             # Порог, показывающий, ка
 MAX_HASH_TIME_DELTA = 200           # Порог, показывающий, как далеко отпечаток должен быть к другому, чтобы оказаться в паре
 
 # Получает отпечаток по экземплярам
-def extractFingerprints(frequencies, song_id, frame_rate = DEFAULT_FREQUENCY_SPEED, window_size = DEFAULT_WINDOW_SIZE, window_overlap_ration = DEFAULT_WINDOW_OVERLAP_RATIO, fan_value = DEFAULT_FAN_VALUE, minimum_amplitude = DEFAULT_MIN_AMPLITUDE):
+def extractFingerprints(frequencies, song_id = 0, frame_rate = DEFAULT_FREQUENCY_SPEED, window_size = DEFAULT_WINDOW_SIZE, window_overlap_ration = DEFAULT_WINDOW_OVERLAP_RATIO, fan_value = DEFAULT_FAN_VALUE, minimum_amplitude = DEFAULT_MIN_AMPLITUDE):
     spectrogram = _generateSpectrogram(frequencies, frame_rate, window_overlap_ration, window_size)
     peaks = _findPeaks(spectrogram, minimum_amplitude)
     fingerprints = _generateFingerprintsFromPeaks(peaks, song_id, fan_value)
