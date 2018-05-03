@@ -93,3 +93,14 @@ class AudioPrints:
             ax.set_title("Spectrogram")
             plt.gca().invert_yaxis()
             plt.show()
+
+    # Удаляет аудио из базы
+    @staticmethod
+    def delete(song_id):
+        song_to_delete = Songs.selectOneById(song_id);
+        if not song_to_delete:
+            raise Exception("No such song found")
+
+        Songs.delete(song_id)
+
+        return song_to_delete

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # coding=utf-8
-# Точка входа распознавателя
+
+# Точка входа в audioprints
 
 import sys
 import argparse
@@ -49,11 +50,14 @@ if __name__ == '__main__':
         for song in songs:
             print "\tid: %s, name: %s" % (song.id, song.name)
 
-        pass
-
     elif args.delete:
-        print("Delete is not implemented yet")
-        pass
+        song_id = args.delete
+
+        try:
+            deleted_song = AudioPrints.delete(song_id)
+            print "Song deleted: %s - %s" % (deleted_song.id, deleted_song.name)
+        except BaseException:
+            print sys.exc_info()[1]
 
     else:
         parser.print_help()
