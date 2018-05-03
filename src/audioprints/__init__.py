@@ -1,6 +1,7 @@
 # coding=utf-8
 
-from audioprints import decoder, extractor, Matcher
+from audioprints.Decoder import Decoder
+from audioprints import extractor, Matcher
 import matplotlib.pyplot as plt
 
 from audioprints.Matcher import Matcher
@@ -15,8 +16,8 @@ class AudioPrints:
 
     @staticmethod
     def add(audio_file_path):
-        song_name = decoder.getSongNameFromPath(audio_file_path)
-        hash = decoder.getSongFileHash(audio_file_path)
+        song_name = Decoder.getSongNameFromPath(audio_file_path)
+        hash = Decoder.getSongFileHash(audio_file_path)
         if not (song_name or hash):
             raise Exception("No song name or hash")
 
@@ -30,7 +31,7 @@ class AudioPrints:
             song_id = song.id
 
         # Декодируем каналы
-        channels, frame_rate = decoder.decodeChannelsFromFile(audio_file_path)
+        channels, frame_rate = Decoder.decodeChannelsFromFile(audio_file_path)
 
         # Снимаем отпечатки
         fingerprints = set()
@@ -46,7 +47,7 @@ class AudioPrints:
 
     @staticmethod
     def match(audio_file_path):
-        channels, frame_rate = decoder.decodeChannelsFromFile(audio_file_path)
+        channels, frame_rate = Decoder.decodeChannelsFromFile(audio_file_path)
 
         # Снимаем отпечатки с каналов
         fingerprints = []
@@ -65,12 +66,12 @@ class AudioPrints:
 
     @staticmethod
     def view(audio_file_path):
-        song_name = decoder.getSongNameFromPath(audio_file_path)
-        song_hash = decoder.getSongFileHash(audio_file_path)
+        song_name = Decoder.getSongNameFromPath(audio_file_path)
+        song_hash = Decoder.getSongFileHash(audio_file_path)
         if not (song_name or song_hash):
             raise Exception("No song name or hash")
 
-        channels, frame_rate = decoder.decodeChannelsFromFile(audio_file_path)
+        channels, frame_rate = Decoder.decodeChannelsFromFile(audio_file_path)
 
         for channel_number, channel_frequencies in enumerate(channels):
             spectogram = extractor.extractSpectogram(channel_frequencies, frame_rate)
