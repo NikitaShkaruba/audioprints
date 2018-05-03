@@ -3,6 +3,10 @@
 from audioprints import decoding, extracting
 import matplotlib.pyplot as plt
 
+from audioprints.objects.Song import Song
+from audioprints.storage.Fingerprints import Fingerprints
+from audioprints.storage.Songs import Songs
+
 # Главный класс, предоставляющий интерфейс для работы с аудио принтами - их добавлением, удалением и поиском
 class AudioPrints:
     def __init__(self):
@@ -11,27 +15,42 @@ class AudioPrints:
     @staticmethod
     def add(audio_file_path):
         song_name = decoding.getSongNameFromPath(audio_file_path)
-        song_hash = decoding.getSongHash(audio_file_path)
-        if not (song_name or song_hash):
+        hash = decoding.getSongFileHash(audio_file_path)
+        if not (song_name or hash):
             raise Exception("No song name or hash")
 
-        channels, frame_rate, file_hash = decoding.decodeChannelsFromFile(audio_file_path)
+        # Добавляем песню в бд, или же вытаскиваем уже существующую
+        song = Songs.selectOneByFileHash(hash)
+        if song and song.is_fingerprinted:
+            raise Exception("Song already fingerprinted")
+        elif not song:
+            song_id = Songs.insert(Song(song_name, hash, False))
+        else:
+            song_id = song.id
 
-        hashes = set()
+        # Декодируем каналы
+        channels, frame_rate = decoding.decodeChannelsFromFile(audio_file_path)
+
+        # Снимаем отпечатки
+        fingerprints = set()
         for channel_number, channel_frequencies in enumerate(channels):
-            hashes |= set(extracting.extractFingerprints(channel_frequencies, frame_rate))
+            fingerprints |= set(extracting.extractFingerprints(channel_frequencies, song_id, frame_rate))
 
-        # Todo: add database saving
-        return None
+        Fingerprints.insertMany(fingerprints)
+
+        # Помечаем песню уже обработанной
+        Songs.updateIsFingerprinted(song_id, True)
+
+        return song_name
 
     @staticmethod
     def view(audio_file_path):
         song_name = decoding.getSongNameFromPath(audio_file_path)
-        song_hash = decoding.getSongHash(audio_file_path)
+        song_hash = decoding.getSongFileHash(audio_file_path)
         if not (song_name or song_hash):
             raise Exception("No song name or hash")
 
-        channels, frame_rate, file_hash = decoding.decodeChannelsFromFile(audio_file_path)
+        channels, frame_rate = decoding.decodeChannelsFromFile(audio_file_path)
 
         for channel_number, channel_frequencies in enumerate(channels):
             spectogram = extracting.extractSpectogram(channel_frequencies, frame_rate)

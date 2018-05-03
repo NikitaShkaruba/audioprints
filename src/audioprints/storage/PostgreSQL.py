@@ -16,6 +16,18 @@ class PostgreSQL:
         pass
 
     @staticmethod
+    def executeInsert(query):
+        connection = psycopg2.connect(**PostgreSQL.config)
+
+        cur = connection.cursor()
+        cur.execute(query)
+        result = cur.fetchone()
+        connection.commit()
+        connection.close()
+
+        return result[0]
+
+    @staticmethod
     def execute(query):
         connection = psycopg2.connect(**PostgreSQL.config)
 

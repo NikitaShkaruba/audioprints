@@ -9,8 +9,18 @@ class Fingerprints:
         pass
 
     @staticmethod
-    def insert(fingerprint):
-        PostgreSQL.execute("""INSERT INTO %s (song_id, song_offset, hash) VALUES (%s, %s, '%s')""" % (Fingerprints.table_name, fingerprint.song_id, fingerprint.offset, fingerprint.hash))
+    def insertOne(fingerprint):
+        Fingerprints.insertMany([ fingerprint ])
+
+    @staticmethod
+    def insertMany(fingerprints):
+        values = []
+        for fingerprint in fingerprints:
+            values.append("""(%s, %s, '%s')""" % (fingerprint.song_id, fingerprint.offset, fingerprint.hash))
+
+        values_string = ', '.join(values)
+
+        PostgreSQL.execute("""INSERT INTO %s (song_id, song_offset, hash) VALUES %s""" % (Fingerprints.table_name, values_string))
 
     @staticmethod
     def selectByHash(hash):
@@ -18,22 +28,26 @@ class Fingerprints:
 
         fingerprints = []
         for row in rows:
-            fingerprints.append(Fingerprint(row[0], row[1], row[2]))
+            fingerprints.append(Fingerprint(row[1], row[2], row[3], row[0]))
 
         return fingerprints
 
     @staticmethod
-    def delete(fingerprint):
-        PostgreSQL.execute("""DELETE FROM %s WHERE song_id = %s AND song_offset = %s AND hash = '%s'""" % (Fingerprints.table_name, fingerprint.song_id, fingerprint.offset, fingerprint.hash))
+    def delete(fingerprint_id):
+        PostgreSQL.execute("""DELETE FROM %s WHERE id = %s""" % (Fingerprints.table_name, fingerprint_id))
+
+    @staticmethod
+    def deleteAll():
+        PostgreSQL.execute("""DELETE FROM %s WHERE 1 = 1""" % Fingerprints.table_name)
 
     @staticmethod
     def createTable():
         PostgreSQL.execute("""
             CREATE TABLE %s (
-                 song_id    INTEGER,
-                 song_offset     INTEGER,
-                 hash       VARCHAR(40),
-                 PRIMARY KEY(song_id, song_offset, hash)
+                 id             SERIAL,
+                 song_id        INTEGER,
+                 song_offset    INTEGER,
+                 hash           VARCHAR(40)
             )""" % Fingerprints.table_name)
 
     @staticmethod

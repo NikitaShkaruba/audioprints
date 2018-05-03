@@ -3,6 +3,8 @@
 # Фаил для снятия отпечатков mp3 фаила
 
 import hashlib
+
+from audioprints.objects.Fingerprint import Fingerprint
 from audioprints.objects.SpectogramPeak import SpectogramPeak
 import numpy as np
 import matplotlib.mlab as mlab
@@ -18,12 +20,12 @@ MIN_HASH_TIME_DELTA = 0             # Порог, показывающий, ка
 MAX_HASH_TIME_DELTA = 200           # Порог, показывающий, как далеко отпечаток должен быть к другому, чтобы оказаться в паре
 
 # Получает отпечаток по экземплярам
-def extractFingerprints(frequencies, frame_rate = DEFAULT_FREQUENCY_SPEED, window_size = DEFAULT_WINDOW_SIZE, window_overlap_ration = DEFAULT_WINDOW_OVERLAP_RATIO, fan_value = DEFAULT_FAN_VALUE, minimum_amplitude = DEFAULT_MIN_AMPLITUDE):
+def extractFingerprints(frequencies, song_id, frame_rate = DEFAULT_FREQUENCY_SPEED, window_size = DEFAULT_WINDOW_SIZE, window_overlap_ration = DEFAULT_WINDOW_OVERLAP_RATIO, fan_value = DEFAULT_FAN_VALUE, minimum_amplitude = DEFAULT_MIN_AMPLITUDE):
     spectrogram = _generateSpectrogram(frequencies, frame_rate, window_overlap_ration, window_size)
     peaks = _findPeaks(spectrogram, minimum_amplitude)
-    hashes = _generateHashesFromPeaks(peaks, fan_value)
+    fingerprints = _generateFingerprintsFromPeaks(peaks, song_id, fan_value)
 
-    return hashes
+    return fingerprints
 
 # Получает пики по экземплярам
 def extractPeaks(frequencies, frame_rate = DEFAULT_FREQUENCY_SPEED, window_size = DEFAULT_WINDOW_SIZE, window_overlap_ration = DEFAULT_WINDOW_OVERLAP_RATIO, minimum_amplitude = DEFAULT_MIN_AMPLITUDE):
@@ -70,7 +72,7 @@ def _findPeaks(spectrogram, min_amplitude = DEFAULT_MIN_AMPLITUDE):
     return peaks
 
 # Генерирует хеши по пикам
-def _generateHashesFromPeaks(peaks, fan_value=DEFAULT_FAN_VALUE):
+def _generateFingerprintsFromPeaks(peaks, song_id, fan_value=DEFAULT_FAN_VALUE):
     for i in range(len(peaks)):
         for j in range(1, fan_value):
             if (i + j) < len(peaks):
@@ -79,4 +81,4 @@ def _generateHashesFromPeaks(peaks, fan_value=DEFAULT_FAN_VALUE):
                 # Если находится рядом, генерируем для пары хеш
                 if MIN_HASH_TIME_DELTA <= time_delta <= MAX_HASH_TIME_DELTA:
                     hashed = hashlib.sha1("%s|%s|%s" % (str(peaks[i].frequency), str(peaks[i + j].frequency), str(time_delta)))
-                    yield (hashed.hexdigest(), peaks[i].time)
+                    yield Fingerprint(song_id, peaks[i].time, hashed.hexdigest())

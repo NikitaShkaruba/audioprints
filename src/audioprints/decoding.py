@@ -20,10 +20,10 @@ def decodeChannelsFromFile(filename, limit=None):
     for chn in xrange(audio_file.channels):
         channels.append(data[chn::audio_file.channels])
 
-    return channels, audio_file.frame_rate, getSongHash(filename)
+    return channels, audio_file.frame_rate
 
 # Генерирует хеш по содержимому для названия фаила
-def getSongHash(file_path, block_size = 2 ** 20):
+def getSongFileHash(file_path, block_size =2 ** 20):
     name = sha1()
 
     with open(file_path, "rb") as opened_file:

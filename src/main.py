@@ -19,7 +19,12 @@ if __name__ == '__main__':
 
     if args.add:
         file_path = args.add
-        AudioPrints.add(file_path)
+
+        try:
+            song_name = AudioPrints.add(file_path)
+            print "Song %s successfully fingerprinted" % song_name
+        except BaseException:
+            print sys.exc_info()[1]
 
     elif args.view:
         file_path = args.view
